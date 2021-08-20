@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"log"
+	"os"
 )
 
 const confirmationMessage = `<h1>Confirmation</h1>
@@ -45,6 +46,15 @@ func routeSecurity(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// Listening to port from heroku
+func getPort() string {
+	p := os.Getenv("PORT")
+	if p != "" {
+		return ":" + p
+	}
+	return ":8080"
+}
+
 
 func main() {
 	// loading static file
@@ -53,10 +63,10 @@ func main() {
 
 	http.HandleFunc("/submitContact", contactHandler)
 
-	fmt.Println("Server started at port 3000")
+	fmt.Println("Server started at port 8080")
 
 	// Handling error and starting server
-	if err := http.ListenAndServe(":3000", nil); err != nil {
+	if err := http.ListenAndServe(getPort(), nil); err != nil {
 		log.Fatal(err)
 	}
 }
