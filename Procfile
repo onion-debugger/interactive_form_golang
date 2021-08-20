@@ -1,0 +1,1 @@
+web: bin/interactive_form_golang
