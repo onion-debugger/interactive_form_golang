@@ -53,10 +53,10 @@ func main() {
 
 	http.HandleFunc("/submitContact", contactHandler)
 
-	fmt.Println("Server started at port 8080")
+	fmt.Println("Server started at port 3000")
 
 	// Handling error and starting server
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":3000", nil); err != nil {
 		log.Fatal(err)
 	}
 }
