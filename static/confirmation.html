@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
+    <link href="css/styles.css" rel="stylesheet" />
+    <title>Confirmation Page</title>
+    <style>
+        .text {
+            font-family: Montserrat;
+        }
+    </style>
+</head>
+<body>
+    <div class="masthead bg-primary text-center">
+        <h1 class="text">Hello, {{ .Name }}</h1>
+        <p>Your contact information has been saved <br> Email: {{ .Email }} <br> Phone Number: {{ .PhoneNumber }} <br> Message: {{ .Message }}</p>
+    </div>
+</body>
+</html>

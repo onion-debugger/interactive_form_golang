@@ -1,47 +1,45 @@
 package main
 
 import (
+	"html/template"
 	"fmt"
 	"net/http"
 	"log"
 	"os"
 )
 
-const confirmationMessage = `<h1>Confirmation</h1>
-<p>Your message has been sent!</p>`
+// creating a struct to handle form validation
+type ContactInfo struct {
+	Name string
+	Email string
+	PhoneNumber string
+	Message string
+	Errors  map[string]string
+}
 
-// routing function contactHandler() for handling form submission
-func contactHandler(writer http.ResponseWriter, request *http.Request) {
-	// handling route security
-	routeSecurity(writer, request)
 
-	if err := request.ParseForm(); err != nil {
-		fmt.Fprintf(writer, "ParseForm() err: %v", err)
-		return
+// routing function for handling form submission
+func confirmation(w http.ResponseWriter, r *http.Request) {
+	routeSecurity(w, r)
+	contactInfo := &ContactInfo{
+		Name: r.FormValue("name"),
+		Email: r.FormValue("email"),
+		PhoneNumber: r.FormValue("phone"),
+		Message: r.FormValue("message"),
 	}
 
-	fmt.Fprintln(writer, confirmationMessage)
-	name := request.FormValue("name")
-	email := request.FormValue("email")
-	phoneNumber := request.FormValue("phone")
-	message := request.FormValue("message")
-
-	fmt.Fprintf(writer, "Name: %s\n", name)
-	fmt.Fprintf(writer, "Email: %s\n", email)
-	fmt.Fprintf(writer, "Phone Number: %s\n", phoneNumber)
-	fmt.Fprintf(writer, "Message: %s\n", message)
-	
+	// handles empty name
+	if contactInfo.Name == "" {
+		fmt.Fprintln(w, "<p>Please go and fill out the form</p>")
+		return
+	}
+	render(w, "./static/confirmation.html", contactInfo)
 }
 
 // Handling route Security
 func routeSecurity(writer http.ResponseWriter, request *http.Request) {
-	if request.URL.Path != "/" {
+	if request.URL.Path != "/confirmation" {
 		http.Error(writer, "<p>This Page doesn't exist</p>", http.StatusNotFound)
-		return
-	}
-
-	if request.Method != "POST" {
-		http.Error(writer, "We cannot process this request", http.StatusNotFound)
 		return
 	}
 }
@@ -55,13 +53,27 @@ func getPort() string {
 	return ":8080"
 }
 
+func render(w http.ResponseWriter, filename string, data interface{}) {
+	tmpl, err := template.ParseFiles(filename)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Sorry, something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	if err := tmpl.Execute(w, data); err != nil {
+		log.Println(err)
+		http.Error(w, "Sorry, something went wrong", http.StatusInternalServerError)
+	}
+} 
+
 
 func main() {
 	// loading static file
 	homePage := http.FileServer(http.Dir("./static"))
 	http.Handle("/", homePage)
 
-	http.HandleFunc("/submitContact", contactHandler)
+	http.HandleFunc("/confirmation", confirmation)
 
 	fmt.Println("Server started at port 8080")
 
